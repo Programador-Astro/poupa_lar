@@ -1,0 +1,20 @@
+# Interface gráfica
+kivy
+kivymd
+
+# Banco de dados
+SQLAlchemy
+mysql-connector-python
+# Segurança (senha hash)
+bcrypt
+
+# Utilidades extras
+requests     # para scraping / API
+beautifulsoup4 # para buscar preços online
+schedule   # para agendar verificações (estoque baixo)
+
+# Futuras notificações e integração
+plyer            # para notificações locais (Android, Windows, etc)
+
+# Caso precise conversões de dados / utils
+python-dotenv      # ler configs de .env

@@ -1,0 +1,43 @@
+# Ambiente virtual
+venv/
+ENV/
+env/
+.venv/
+
+# Arquivos Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos de log
+*.log
+
+# Configs do VS Code
+.vscode/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários
+*.tmp
+*.swp
+*.bak
+
+# Arquivos de build/distribuição
+build/
+dist/
+*.egg-info/
+
+# Arquivos do Kivy
+*.kv~
+
+# Jupyter (caso use)
+.ipynb_checkpoints/
+
+# Cache do pip
+pip-wheel-metadata/
+*.whl
+
+# Outras IDEs
+.idea/
