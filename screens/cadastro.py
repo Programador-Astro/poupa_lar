@@ -1,99 +1,240 @@
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.screenmanager import MDScreenManager
 from kivy.lang import Builder
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
-from database.models import Usuario
-KV = '''
+from database.models import Casa, Usuario
+from database.connection import db
+import requests
+
+Builder.load_string('''
 <CadastroScreen>:
     name: "cadastro"
 
-    MDBoxLayout:
-        orientation: "vertical"
-        spacing: dp(20)
-        padding: dp(40)
-        md_bg_color: 1, 1, 1, 1
+    MDScreenManager:
+        id: screen_manager
 
-        MDLabel:
-            text: "Crie sua conta"
-            halign: "center"
-            font_style: "H4"
-            theme_text_color: "Custom"
-            text_color: app.theme_cls.primary_color
+        MDScreen:
+            name: "casa"
 
-        MDTextField:
-            id: nome
-            hint_text: "Nome"
-            icon_right: "account"
-            size_hint_x: None
-            width: 300
-            pos_hint: {"center_x": 0.5}
-            mode: "rectangle"
+            MDBoxLayout:
+                orientation: "vertical"
+                padding: "24dp"
+                spacing: "16dp"
 
-        MDTextField:
-            id: email
-            hint_text: "E-mail"
-            icon_right: "email"
-            size_hint_x: None
-            width: 300
-            pos_hint: {"center_x": 0.5}
-            mode: "rectangle"
+                MDLabel:
+                    text: "Primeiro, vamos cadastrar sua CASA!"
+                    halign: "center"
+                    font_style: "H5"
 
-        MDTextField:
-            id: senha
-            hint_text: "Senha"
-            password: True
-            icon_right: "lock"
-            size_hint_x: None
-            width: 300
-            pos_hint: {"center_x": 0.5}
-            mode: "rectangle"
-        MDTextField:
-            id: confirmar_senha
-            hint_text: "Confirmar Senha"
-            icon_right: "lock"
-            password: True
-            size_hint_x: None
-            width: 300
-            pos_hint: {"center_x": 0.5}
-            mode: "rectangle"
-        MDRaisedButton:
-            text: "Cadastrar"
-            md_bg_color: app.theme_cls.primary_color
-            text_color: 1, 1, 1, 1
-            pos_hint: {"center_x": 0.5}
-            on_release: root.cadastrar()
+                MDTextField:
+                    id: cep_field
+                    hint_text: "Digite o CEP"
+                    max_text_length: 9
+                    input_filter: "int"
+                    on_focus: if not self.focus: root.formatar_cep(self.text)
+                    on_text_validate: root.buscar_cep(self.text)
+                    mode: "rectangle"
 
-        MDRaisedButton:
-            text: "Voltar ao login"
-            md_bg_color: 1, 1, 1, 1
-            text_color: app.theme_cls.primary_color
-            pos_hint: {"center_x": 0.5}
-            on_release: root.manager.current = "login"
-'''
+                MDTextField:
+                    id: rua_field
+                    hint_text: "Rua"
+                    readonly: True
+                    disabled: True
+                    mode: "rectangle"
 
-Builder.load_string(KV)
+                MDBoxLayout:
+                    spacing: "12dp"
+
+                    MDTextField:
+                        id: cidade_field
+                        hint_text: "Cidade"
+                        readonly: True
+                        disabled: True
+                        mode: "rectangle"
+
+                    MDTextField:
+                        id: estado_field
+                        hint_text: "Estado"
+                        readonly: True
+                        disabled: True
+                        mode: "rectangle"
+
+                MDTextField:
+                    id: numero_field
+                    hint_text: "Número"
+                    mode: "rectangle"
+
+                MDTextField:
+                    id: complemento_field
+                    hint_text: "Complemento"
+                    mode: "rectangle"
+
+                MDLabel:
+                    id: status_label
+                    text: ""
+                    halign: "center"
+                    theme_text_color: "Hint"
+
+                MDRaisedButton:
+                    text: "Próximo"
+                    md_bg_color: app.theme_cls.primary_color
+                    text_color: 1, 1, 1, 1
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.ir_para_usuario()
+
+        MDScreen:
+            name: "usuario"
+
+            MDBoxLayout:
+                orientation: "vertical"
+                padding: "24dp"
+                spacing: "16dp"
+
+                MDLabel:
+                    text: "Agora vamos cadastrar seus dados"
+                    halign: "center"
+                    font_style: "H5"
+                MDTextField:
+                    id: usuario_field
+                    hint_text: "Usuario"
+                    mode: "rectangle"
+                MDTextField:
+                    id: senha_field
+                    hint_text: "Senha"
+                    password: True
+                    mode: "rectangle"
+
+                MDTextField:
+                    id: confirmar_senha_field
+                    hint_text: "Confirmar Senha"
+                    password: True
+                    mode: "rectangle"
+
+                MDTextField:
+                    id: nome_field
+                    hint_text: "Nome Completo"
+                    mode: "rectangle"
+
+                MDTextField:
+                    id: email_field
+                    hint_text: "E-mail"
+                    mode: "rectangle"
+
+                
+                MDRaisedButton:
+                    text: "Cadastrar"
+                    md_bg_color: app.theme_cls.primary_color
+                    text_color: 1, 1, 1, 1
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.cadastrar_usuario()
+
+                MDRaisedButton:
+                    text: "Voltar"
+                    md_bg_color: 1, 1, 1, 1
+                    text_color: app.theme_cls.primary_color
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.voltar_para_casa()
+''')
 
 class CadastroScreen(MDScreen):
-    def cadastrar(self):
-        nome = self.ids.nome.text
-        email = self.ids.email.text
-        senha = self.ids.senha.text
-        confirmar_senha = self.ids.confirmar_senha.text
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.flag_casa = False
+        self.nova_casa = None
 
-        
-        if not nome or not email or not senha or not confirmar_senha:
-            self.show_dialog("Preencha todos os campos.")
+    def formatar_cep(self, cep):
+        cep_numeros = ''.join(filter(str.isdigit, cep))[:8]
+        if len(cep_numeros) == 8:
+            cep_formatado = f"{cep_numeros[:5]}-{cep_numeros[5:]}"
+            self.ids.cep_field.text = cep_formatado
+            self.buscar_cep(cep_formatado)
         else:
-            # Aqui você pode conectar ao banco de dados
+            self.ids.status_label.text = "CEP inválido. Deve conter 8 dígitos."
+            self.flag_casa = False
 
-            
-            self.show_dialog("Usuário cadastrado com sucesso!")
-            self.manager.current = "login"
+    def buscar_cep(self, cep):
+        cep = ''.join(filter(str.isdigit, cep))
+        if len(cep) != 8:
+            self.ids.status_label.text = "CEP inválido. Deve conter 8 dígitos."
+            self.flag_casa = False
+            return
 
-    def show_dialog(self, mensagem):
-        dialog = MDDialog(
-            title="Cadastro",
-            text=mensagem,
-            buttons=[],
+        url = f"https://viacep.com.br/ws/{cep}/json/"
+        try:
+            response = requests.get(url)
+            data = response.json()
+
+            if "erro" in data:
+                self.ids.status_label.text = "CEP não encontrado."
+                self.flag_casa = False
+            else:
+                self.ids.rua_field.text = data.get("logradouro", "")
+                self.ids.cidade_field.text = data.get("localidade", "")
+                self.ids.estado_field.text = data.get("uf", "")
+                self.ids.status_label.text = "Endereço carregado!"
+                self.flag_casa = True
+        except Exception as e:
+            self.ids.status_label.text = f"Erro: {e}"
+            self.flag_casa = False
+
+    def ir_para_usuario(self):
+        if not self.flag_casa:
+            self.ids.status_label.text = "Preencha o endereço corretamente."
+            return
+
+        self.nova_casa = Casa(
+            codigo="123",
+            nome="Minha Casa",
+            uf=self.ids.estado_field.text,
+            cidade=self.ids.cidade_field.text,
+            cep=self.ids.cep_field.text,
+            endereco=self.ids.rua_field.text,
+            numero=self.ids.numero_field.text,
+            complemento=self.ids.complemento_field.text
         )
-        dialog.open()
+
+        self.ids.screen_manager.current = "usuario"
+
+    def voltar_para_casa(self):
+        self.ids.screen_manager.current = "casa"
+
+    def cadastrar_usuario(self):
+        usuario   = self.ids.usuario_field.text
+        nome      = self.ids.nome_field.text
+        email     = self.ids.email_field.text
+        senha     = self.ids.senha_field.text
+        confirmar = self.ids.confirmar_senha_field.text
+
+        if not usuario or not nome or not email or not senha or not confirmar:
+            self.mensagem("Preencha todos os campos.")
+            return
+
+        if senha != confirmar:
+            self.mensagem("Senhas não coincidem.")
+            return
+
+        if not self.nova_casa:
+            self.mensagem("Erro: casa não criada.")
+            return
+
+        # Adiciona casa e usuário ao banco
+        db.add(self.nova_casa)
+        db.flush()
+
+        novo_usuario = Usuario(
+            usuario    = usuario,
+            nome       = nome,
+            email      = email,
+            senha_hash = senha,
+            casa_id    =  self.nova_casa.id
+        )
+
+        db.add(novo_usuario)
+        db.commit()
+
+        self.mensagem("Cadastro concluído com sucesso!")
+        self.manager.current = "login"
+
+    def mensagem(self, texto):
+        MDDialog(title="Cadastro", text=texto, buttons=[]).open()

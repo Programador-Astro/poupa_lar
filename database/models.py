@@ -7,8 +7,14 @@ Base = declarative_base()
 class Casa(Base):
     __tablename__ = 'casas'
     id = Column(Integer, primary_key=True)
-    nome = Column(String(100))
     codigo = Column(String(50), unique=True)
+    nome = Column(String(100))
+    uf = Column(String(50), nullable=False)
+    cidade = Column(String(50), nullable=False)
+    cep = Column(String(50), nullable=False)
+    endereco = Column(String(50), nullable=False)
+    numero = Column(String(50), nullable=False)
+    complemento = Column(String(200), nullable=False)
 
     usuarios = relationship("Usuario", back_populates="casa")
     itens = relationship("ItemEstoque", back_populates="casa")
@@ -16,6 +22,7 @@ class Casa(Base):
 class Usuario(Base):
     __tablename__ = 'usuarios'
     id = Column(Integer, primary_key=True)
+    usuario = Column(String(50), unique=True, nullable=False)
     nome = Column(String(100))
     email = Column(String(120), unique=True)
     senha_hash = Column(Text)

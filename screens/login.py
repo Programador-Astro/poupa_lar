@@ -3,7 +3,8 @@
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.dialog import MDDialog
 from kivy.lang import Builder
-
+from database.models import Usuario
+from database.connection import db
 KV = '''
 <LoginScreen>:
     name: "login"
@@ -58,9 +59,10 @@ class LoginScreen(MDScreen):
     def login(self):
         email = self.ids.email.text
         senha = self.ids.senha.text
-
+        usuario = db.query(Usuario).filter_by(email=email).first()
+        
         # Aqui entra a lógica de autenticação real
-        if email == "teste@email.com" and senha == "1234":
+        if usuario.senha_hash == senha:
             self.manager.current = "home"
         else:
             self.show_error("E-mail ou senha incorretos")

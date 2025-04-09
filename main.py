@@ -3,7 +3,7 @@ from kivymd.uix.screenmanager import MDScreenManager
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.label import MDLabel
 from screens.login import LoginScreen
-from screens.cadastro import CadastroScreen 
+from screens.cadastro import CadastroScreen
 
 class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
