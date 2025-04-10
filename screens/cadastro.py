@@ -7,9 +7,14 @@ from kivymd.uix.snackbar import Snackbar
 
 from database.models import Casa, Usuario
 from database.connection import db
+
+import uuid
 import re
 import requests
 from funcs_internas import *
+
+
+
 Builder.load_string('''
 <CadastroScreen>:
     name: "cadastro"
@@ -145,7 +150,7 @@ class CadastroScreen(MDScreen):
         super().__init__(**kwargs)
         self.flag_casa = False#Serve pra verificar se a casa pode ser criada sem problemas
         self.nova_casa = None
-
+        
     def formatar_cep(self, cep):
         cep_numeros = ''.join(filter(str.isdigit, cep))[:8]
         if len(cep_numeros) == 8:
@@ -203,13 +208,16 @@ class CadastroScreen(MDScreen):
         self.ids.screen_manager.current = "casa"
 
     def cadastrar_usuario(self):
+        codigo_verificacao = str(uuid.uuid4())[:6]
         usuario   = self.ids.usuario_field.text
         nome      = self.ids.nome_field.text
         email     = self.ids.email_field.text.strip()
         senha     = self.ids.senha_field.text
         confirmar = self.ids.confirmar_senha_field.text
-        codigo_verificacao = codigo_verificacao,
+        codigo_verificacao = codigo_verificacao
         email_confirmado = False
+
+        
         #VALIDAÇÃO DO EMAIL
         email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         if not re.match(email_regex, email):
@@ -252,7 +260,9 @@ class CadastroScreen(MDScreen):
             nome       = nome,
             email      = email,
             senha_hash = senha,
-            casa_id    =  self.nova_casa.id
+            casa_id    =  self.nova_casa.id,
+            codigo_verificacao = codigo_verificacao,
+            email_confirmado = email_confirmado,
         )
 
         db.add(novo_usuario)
