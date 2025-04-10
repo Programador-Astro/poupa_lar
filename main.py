@@ -4,7 +4,8 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.label import MDLabel
 from screens.login import LoginScreen
 from screens.cadastro import CadastroScreen
-
+from screens.home import HomeScreen
+"""
 class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -16,7 +17,7 @@ class HomeScreen(MDScreen):
                 font_style="H5"
             )
         )
-
+"""
 class PoupaLarApp(MDApp):
     def build(self):
         self.title = "PoupaLar"

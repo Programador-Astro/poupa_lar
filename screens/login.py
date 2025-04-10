@@ -1,10 +1,12 @@
-# Arquivo: screens/login.py
-
-from kivymd.uix.screen import MDScreen
+from kivymd.uix.screen import MDScreen 
+from kivymd.uix.button import MDRaisedButton  
 from kivymd.uix.dialog import MDDialog
 from kivy.lang import Builder
-from database.models import Usuario
+from kivy.clock import Clock
+
 from database.connection import db
+from database.models import Usuario
+
 KV = '''
 <LoginScreen>:
     name: "login"
@@ -60,10 +62,10 @@ class LoginScreen(MDScreen):
         email = self.ids.email.text
         senha = self.ids.senha.text
         usuario = db.query(Usuario).filter_by(email=email).first()
-        
-        # Aqui entra a lógica de autenticação real
-        if usuario.senha_hash == senha:
+
+        if usuario and usuario.senha_hash == senha:
             self.manager.current = "home"
+            Clock.schedule_once(self.mostrar_boas_vindas, 0.5)
         else:
             self.show_error("E-mail ou senha incorretos")
 
@@ -73,3 +75,23 @@ class LoginScreen(MDScreen):
             text=mensagem,
             buttons=[],
         ).open()
+
+    def mostrar_boas_vindas(self, *args):
+        dialog = MDDialog(
+            title="Bem-vindo ao PoupaLar! 🏡",
+            text=(
+                "Olá!\n\n"
+                "Aqui estão algumas dicas rápidas:\n"
+                "• Cadastre os produtos que você tem em casa 🧼\n"
+                "• Defina o estoque mínimo para receber alertas 📦\n"
+                "• Compare preços dos mercados e economize 💰\n\n"
+                "Aproveite o app!"
+            ),
+            buttons=[
+                MDRaisedButton(
+                    text="Começar",
+                    on_release=lambda x: dialog.dismiss()
+                )
+            ]
+        )
+        dialog.open()

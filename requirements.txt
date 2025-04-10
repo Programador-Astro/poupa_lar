@@ -1,20 +1,29 @@
-# Interface gráfica
-kivy
-kivymd
-
-# Banco de dados
-SQLAlchemy
-mysql-connector-python
-# Segurança (senha hash)
-bcrypt
-
-# Utilidades extras
-requests     # para scraping / API
-beautifulsoup4 # para buscar preços online
-schedule   # para agendar verificações (estoque baixo)
-
-# Futuras notificações e integração
-plyer            # para notificações locais (Android, Windows, etc)
-
-# Caso precise conversões de dados / utils
-python-dotenv      # ler configs de .env
+bcrypt==4.3.0
+beautifulsoup4==4.13.3
+certifi==2025.1.31
+charset-normalizer==3.4.1
+docutils==0.21.2
+filetype==1.2.0
+greenlet==3.1.1
+idna==3.10
+kaki==0.1.9
+Kivy==2.3.1
+Kivy-Garden==0.1.5
+kivy_deps.angle==0.4.0
+kivy_deps.glew==0.3.1
+kivy_deps.sdl2==0.8.0
+kivymd==1.2.0
+mysql-connector-python==9.2.0
+pillow==11.1.0
+plyer==2.1.0
+Pygments==2.19.1
+pypiwin32==223
+python-dotenv==1.1.0
+pywin32==310
+requests==2.32.3
+schedule==1.2.2
+soupsieve==2.6
+SQLAlchemy==2.0.40
+typing_extensions==4.13.1
+urllib3==2.3.0
+watchdog==6.0.0

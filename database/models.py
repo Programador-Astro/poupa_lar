@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date, Text, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import date
 
@@ -28,6 +28,9 @@ class Usuario(Base):
     senha_hash = Column(Text)
     casa_id = Column(Integer, ForeignKey('casas.id'))
 
+    
+    email_confirmado = Column(Boolean, default=False)
+    codigo_verificacao = Column(String(10), nullable=True)
     casa = relationship("Casa", back_populates="usuarios")
 
 class ItemEstoque(Base):

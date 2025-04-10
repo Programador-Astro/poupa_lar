@@ -3,10 +3,13 @@ from kivymd.uix.screenmanager import MDScreenManager
 from kivy.lang import Builder
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.snackbar import Snackbar
+
 from database.models import Casa, Usuario
 from database.connection import db
+import re
 import requests
-
+from funcs_internas import *
 Builder.load_string('''
 <CadastroScreen>:
     name: "cadastro"
@@ -140,7 +143,7 @@ Builder.load_string('''
 class CadastroScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.flag_casa = False
+        self.flag_casa = False#Serve pra verificar se a casa pode ser criada sem problemas
         self.nova_casa = None
 
     def formatar_cep(self, cep):
@@ -184,7 +187,7 @@ class CadastroScreen(MDScreen):
             return
 
         self.nova_casa = Casa(
-            codigo="123",
+            codigo="1",
             nome="Minha Casa",
             uf=self.ids.estado_field.text,
             cidade=self.ids.cidade_field.text,
@@ -202,9 +205,31 @@ class CadastroScreen(MDScreen):
     def cadastrar_usuario(self):
         usuario   = self.ids.usuario_field.text
         nome      = self.ids.nome_field.text
-        email     = self.ids.email_field.text
+        email     = self.ids.email_field.text.strip()
         senha     = self.ids.senha_field.text
         confirmar = self.ids.confirmar_senha_field.text
+        codigo_verificacao = codigo_verificacao,
+        email_confirmado = False
+        #VALIDAÇÃO DO EMAIL
+        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        if not re.match(email_regex, email):
+            self.mensagem("E-mail inválido.")
+            return
+        # Verifica se já existe um usuário com este e-mail
+        email_existe = db.query(Usuario).filter_by(email=email).first()
+        if email_existe:
+            self.mensagem("Este e-mail já está em uso.")
+            return
+        
+        
+        
+        
+        #Fim validação EMAIL
+
+
+
+
+
 
         if not usuario or not nome or not email or not senha or not confirmar:
             self.mensagem("Preencha todos os campos.")
