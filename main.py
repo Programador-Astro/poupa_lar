@@ -5,6 +5,8 @@ from kivymd.uix.label import MDLabel
 from screens.login import LoginScreen
 from screens.cadastro import CadastroScreen
 from screens.home import HomeScreen
+from screens.verificacao import VerificacaoScreen
+
 """
 class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
@@ -28,6 +30,7 @@ class PoupaLarApp(MDApp):
         sm = MDScreenManager()
         sm.add_widget(LoginScreen())
         sm.add_widget(CadastroScreen())
+        sm.add_widget(VerificacaoScreen(name="verificacao"))
         sm.add_widget(HomeScreen())
         return sm
 

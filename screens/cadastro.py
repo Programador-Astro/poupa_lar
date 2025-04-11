@@ -8,6 +8,8 @@ from kivymd.uix.snackbar import Snackbar
 from database.models import Casa, Usuario
 from database.connection import db
 
+from utils.email_utils import enviar_email_verificacao
+
 import uuid
 import re
 import requests
@@ -192,7 +194,7 @@ class CadastroScreen(MDScreen):
             return
 
         self.nova_casa = Casa(
-            codigo="1",
+            codigo="8",
             nome="Minha Casa",
             uf=self.ids.estado_field.text,
             cidade=self.ids.cidade_field.text,
@@ -267,9 +269,14 @@ class CadastroScreen(MDScreen):
 
         db.add(novo_usuario)
         db.commit()
+        enviar_email_verificacao(email, codigo_verificacao)
 
         self.mensagem("Cadastro concluído com sucesso!")
-        self.manager.current = "login"
+        verificacao_screen = self.manager.get_screen("verificacao")
+        verificacao_screen.usuario_email = email
+        self.manager.current = "verificacao"
+
+        
 
     def mensagem(self, texto):
         MDDialog(title="Cadastro", text=texto, buttons=[]).open()

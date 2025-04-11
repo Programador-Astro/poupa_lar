@@ -62,8 +62,11 @@ class LoginScreen(MDScreen):
         email = self.ids.email.text
         senha = self.ids.senha.text
         usuario = db.query(Usuario).filter_by(email=email).first()
-
+        
         if usuario and usuario.senha_hash == senha:
+            if usuario.email_confirmado == False:
+                self.manager.current = 'verificacao'
+                return
             self.manager.current = "home"
             Clock.schedule_once(self.mostrar_boas_vindas, 0.5)
         else:
